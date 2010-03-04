@@ -54,7 +54,7 @@ mkdir -p public/javascripts
 
 h2. Example 1: FB Connect
 
-See "examples/fb_connect"::node-facebook/blob/master/examples/fb_connect for the these example files.
+See "examples/fb_connect":node-facebook/blob/master/examples/fb_connect for the these example files.
 
 h3. /app.js
 
@@ -184,7 +184,7 @@ h3. /public/index.html
 
 h2. Example 2: A Facebook Application running in the Canvas
 
-See "examples/fb_iframe"::node-facebook/blob/master/examples/fb_iframe for the these example files.
+See "examples/fb_iframe":node-facebook/blob/master/examples/fb_iframe for the these example files.
 
 h3. /app.js
 
