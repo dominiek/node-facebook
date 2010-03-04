@@ -1,0 +1,63 @@
+
+require.paths.unshift(__dirname + '/../../lib')
+require.paths.unshift(__dirname + '/../../lib/support/express/lib')
+require.paths.unshift(__dirname + '/../../lib/support/hashlib/build/default')
+
+require('express')
+require('express/plugins')
+require('sys')
+
+configure(function(){
+  use(MethodOverride)
+  use(ContentLength)
+  use(Cookie)
+  use(Session)
+  use(CommonLogger)
+  use(require('facebook').Facebook, {
+    apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
+    apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
+  })
+  set('root', __dirname)
+})
+
+// Called to get information about the current authenticated user
+get('/fbSession', function(){
+  var fbSession = this.fbSession()
+  
+  if(fbSession) {
+    // Here would be a nice place to lookup userId in the database
+    // and supply some additional information for the client to use
+  }
+  
+  // The client will only assume authentication was OK if userId exists
+  this.contentType('json')
+  this.halt(200, JSON.stringify(fbSession || {}))
+})
+
+// Called after a successful FB Connect
+post('/fbSession', function() {
+  var fbSession = this.fbSession() // Will return null if verification was unsuccesful
+  
+  if(fbSession) {
+    // Now that we have a Facebook Session, we might want to store this new user in the db
+    // Also, in this.params there is additional information about the user (name, pic, first_name, etc)
+    // Note of warning: unlike fbSession, this additional information has not been verified
+    fbSession.first_name = this.params.post['first_name']
+  }
+  
+  this.contentType('json')
+  this.halt(200, JSON.stringify(fbSession || {}))
+})
+
+// Called on Facebook logout
+post('/fbLogout', function() {
+  this.fbLogout();
+  this.halt(200, JSON.stringify({}))
+})
+
+// Static files in ./public
+get('/', function(file){ this.sendfile(__dirname + '/public/index.html') })
+get('/xd_receiver.htm', function(file){ this.sendfile(__dirname + '/public/xd_receiver.htm') })
+get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
+
+run()

@@ -1,0 +1,6 @@
+[submodule "lib/support/express"]
+	path = lib/support/express
+	url = git://github.com/visionmedia/express.git
+[submodule "lib/support/hashlib"]
+	path = lib/support/hashlib
+	url = git://github.com/brainfucker/hashlib.git
