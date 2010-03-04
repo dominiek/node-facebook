@@ -54,11 +54,13 @@ mkdir -p public/javascripts
 
 h2. Example 1: FB Connect
 
-h3. app.js
+See "examples/fb_connect"::node-facebook/blob/master/examples/fb_connect for the these example files.
 
-<pre><code>require.paths.unshift(__dirname + '/../../lib')
-require.paths.unshift(__dirname + '/../../lib/support/express/lib')
-require.paths.unshift(__dirname + '/../../lib/support/hashlib/build/default')
+h3. /app.js
+
+<pre><code>require.paths.unshift(__dirname + '/lib')
+require.paths.unshift(__dirname + '/lib/support/express/lib')
+require.paths.unshift(__dirname + '/lib/support/hashlib/build/default')
 
 require('express')
 require('express/plugins')
@@ -120,7 +122,7 @@ run()
 
 </code></pre>
 
-h3. public/index.html
+h3. /public/index.html
 
 <pre><code><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml"> 
@@ -182,9 +184,13 @@ h3. public/index.html
 
 h2. Example 2: A Facebook Application running in the Canvas
 
-<pre><code>require.paths.unshift(__dirname + '/../../lib')
-require.paths.unshift(__dirname + '/../../lib/support/express/lib')
-require.paths.unshift(__dirname + '/../../lib/support/hashlib/build/default')
+See "examples/fb_iframe"::node-facebook/blob/master/examples/fb_iframe for the these example files.
+
+h3. /app.js
+
+<pre><code>require.paths.unshift(__dirname + '/lib')
+require.paths.unshift(__dirname + '/lib/support/express/lib')
+require.paths.unshift(__dirname + '/lib/support/hashlib/build/default')
 
 require('express')
 require('express/plugins')
@@ -230,7 +236,7 @@ run()
 
 </code></pre>
 
-h3. public/iframe.html
+h3. /public/iframe.html
 
 <pre><code><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml"> 
