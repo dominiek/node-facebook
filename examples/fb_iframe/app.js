@@ -1,5 +1,5 @@
 
-// Facebook Connect example for Express on NodeJS
+// Facebook Iframe Application example for Express on NodeJS
 
 require.paths.unshift(__dirname + '/../../lib')
 require.paths.unshift(__dirname + '/../../lib/support/express/lib')
@@ -7,6 +7,7 @@ require.paths.unshift(__dirname + '/../../lib/support/hashlib/build/default')
 
 require('express')
 require('express/plugins')
+require('sys')
 
 configure(function(){
   use(MethodOverride)
@@ -19,6 +20,12 @@ configure(function(){
     apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
   })
   set('root', __dirname)
+})
+
+// This is the canvas URL set in the Facebook Application settings
+get('/iframe', function (){
+  var fbSession = this.fbSession() // Will create a session based on verified data from the GET params
+  this.sendfile(__dirname + '/public/iframe.html')
 })
 
 // Called to get information about the current authenticated user
@@ -35,29 +42,7 @@ get('/fbSession', function(){
   this.halt(200, JSON.stringify(fbSession || {}))
 })
 
-// Called after a successful FB Connect
-post('/fbSession', function() {
-  var fbSession = this.fbSession() // Will return null if verification was unsuccesful
-  
-  if(fbSession) {
-    // Now that we have a Facebook Session, we might want to store this new user in the db
-    // Also, in this.params there is additional information about the user (name, pic, first_name, etc)
-    // Note of warning: unlike fbSession, this additional information has not been verified
-    fbSession.first_name = this.params.post['first_name']
-  }
-  
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
-})
-
-// Called on Facebook logout
-post('/fbLogout', function() {
-  this.fbLogout();
-  this.halt(200, JSON.stringify({}))
-})
-
 // Static files in ./public
-get('/', function(file){ this.sendfile(__dirname + '/public/index.html') })
 get('/xd_receiver.htm', function(file){ this.sendfile(__dirname + '/public/xd_receiver.htm') })
 get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
 
