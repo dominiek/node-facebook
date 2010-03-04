@@ -1,17 +1,16 @@
 h1. Facebook Connect for NodeJS
 
-This library contains to files and some examples that allow you to easily integrate with Facebook. By making use of "Facebook's Javascript Client Library":http://wiki.developers.facebook.com/index.php/JavaScript_Client_Library we only have to do the minimal amount effort on the server-side, which "could be a good thing":synaptify.com/?p=613702.
+This library contains NodeJS and jQuery scripts together with examples that allow you to easily integrate with Facebook. By making use of "Facebook's Javascript Client Library":http://wiki.developers.facebook.com/index.php/JavaScript_Client_Library we only have to do the minimal amount effort on the server-side, which "could be a good thing":http://synaptify.com/?p=613702.
 
 There are two main ways of integrating with Facebook and both require you to "sign up for a Facebook Application":http://facebook.com/developer. If you want your web application to run inside Facebook, you need to make sure to verify users inside the Facebook Canvas (See example 2), otherwise, if you want users to use Facebook Connect to log onto your site, check Example 1.
 
 h2. Dependencies
 
-In order to use these plugins, you need to install both "NodeJS":http://nodejs.org and the "Express Web Framework":http://github.com/visionmedia/express/ (that runs on NodeJS). 
+In order to use these plugins, you need to install both "NodeJS":http://nodejs.org and the "Express Web Framework":http://github.com/visionmedia/express/ on top of it. 
 
 Express can easily be installed like this:
 
-<pre><code>
-cd myproject
+<pre><code>cd myproject
 git init
 mkdir -p lib/support
 
@@ -23,39 +22,41 @@ git submodule update
 
 Also, we need to install "hashlib":http://github.com/brainfucker/hashlib, a NodeJS library provided by mr Brainfucker:
 
-<pre><code>
-git submodule add git://github.com/brainfucker/hashlib.git lib/support/hashlib
+<pre><code>git submodule add git://github.com/brainfucker/hashlib.git lib/support/hashlib
 cd lib/support/hashlib
 make
 </code></pre>
 
 h2. Setting up your Project
 
-<pre><code>
-cd myproject
+1. Create the necessary folders:
+
+<pre><code>cd myproject
 mkdir -p lib
 mkdir -p public/javascripts
 </code></pre>
 
-Now make sure to copy lib/facebook.js into /lib and lib/jquery.facebook.js in public/javascripts. Also, you will need to place a file called xd_receiver.htm into your public directory, this is for "Facebook cross-domain communication":http://wiki.developers.facebook.com/index.php/Cross_Domain_Communication_Channel:
+2. Copy lib/facebook.js into /lib and lib/jquery.facebook.js into public/javascripts
 
-<pre><code>
-  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
-  <html xmlns="http://www.w3.org/1999/xhtml" > 
-  <head> 
-      <title>Cross-Domain Receiver Page</title> 
-  </head> 
-  <body> 
-      <script src="http://static.ak.facebook.com/js/api_lib/v0.4/XdCommReceiver.js?v2" type="text/javascript"></script> 
-  </body> 
-  </html>
+3. Place a file called xd_receiver.htm into your public directory, this is for "Facebook cross-domain communication":http://wiki.developers.facebook.com/index.php/Cross_Domain_Communication_Channel:
+
+<pre><code><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" > 
+<head> 
+    <title>Cross-Domain Receiver Page</title> 
+</head> 
+<body> 
+    <script src="http://static.ak.facebook.com/js/api_lib/v0.4/XdCommReceiver.js?v2" type="text/javascript"></script> 
+</body> 
+</html>
 </code></pre>
 
 h2. Example 1: FB Connect
 
-<pre><code>
-require.paths.unshift(__dirname + '/../../lib')
+h3. app.js
+
+<pre><code>require.paths.unshift(__dirname + '/../../lib')
 require.paths.unshift(__dirname + '/../../lib/support/express/lib')
 require.paths.unshift(__dirname + '/../../lib/support/hashlib/build/default')
 
@@ -119,10 +120,69 @@ run()
 
 </code></pre>
 
+h3. public/index.html
+
+<pre><code><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+ <head> 
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
+    <script type="text/javascript" src="/javascripts/jquery.facebook.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $.fbInit('e1249f7d4bc25b8f90e5c9c7523e3ee1');
+
+        // FB Connect action
+        $('#fb-connect').bind('click', function () {
+          $.fbConnect({'include': ['first_name', 'last_name', 'name', 'pic']}, function (fbSession) {
+            $('.not_authenticated').hide();
+            $('.authenticated').show();
+            $('#fb-first_name').html(fbSession.first_name);
+          });
+          return false;
+        });
+
+        // FB Logout action
+        $('#fb-logout').bind('click', function () {
+          $.fbLogout(function () {
+            $('.authenticated').hide();
+            $('.not_authenticated').show();
+          });
+          return false;
+        });
+
+        // Check whether we're logged in and arrange page accordingly
+        $.fbIsAuthenticated(function (fbSession) {
+          // Authenticated!
+          $('.authenticated').show();
+          $('#fb-first_name').html(fbSession.first_name);
+        }, function () {
+          // Not authenticated
+          $('.not_authenticated').show();
+        });
+
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="fb-root"></div>
+    <div id="my-account">
+      <div class="authenticated" style="display: none">
+        Hi there <span id="fb-first_name"></span>!
+        <a href="#" id="fb-logout">Logout</a>
+      </div>
+      <div class="not_authenticated" style="display: none">
+        <a href="#" id="fb-connect">Connect with Facebook</a>
+      </div>
+    </div>
+  </body> 
+</html> 
+</code></pre>
+
 h2. Example 2: A Facebook Application running in the Canvas
 
-<pre><code>  
-require.paths.unshift(__dirname + '/../../lib')
+<pre><code>require.paths.unshift(__dirname + '/../../lib')
 require.paths.unshift(__dirname + '/../../lib/support/express/lib')
 require.paths.unshift(__dirname + '/../../lib/support/hashlib/build/default')
 
@@ -169,3 +229,48 @@ get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname +
 run()
 
 </code></pre>
+
+h3. public/iframe.html
+
+<pre><code><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+ <head> 
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
+    <script type="text/javascript" src="/javascripts/jquery.facebook.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $.fbInit('e1249f7d4bc25b8f90e5c9c7523e3ee1');
+        // Check whether we're logged in and arrange page accordingly
+        $.fbIsAuthenticated(function (fbSession) {
+          // Authenticated!
+          $.fbProfile(['first_name'], function (profile) {
+            $('#fb-first_name').html(profile.first_name);
+            $('.authenticated').show();
+          });
+        }, function () {
+          // Not authenticated
+          $('.not_authenticated').show();
+        });
+        
+      });
+    </script>
+  </head>
+  
+  <body>
+    <div id="fb-root"></div>
+    <div id="my-account">
+      <div class="authenticated" style="display: none">
+        Hi there <span id="fb-first_name"></span>!
+      </div>
+      <div class="not_authenticated" style="display: none">
+        Viewing anonymously.
+      </div>
+    </div>
+  </body> 
+</html> 
+</code></pre>
+
+h2. License
+
+"MIT":http://www.opensource.org/licenses/mit-license.php
