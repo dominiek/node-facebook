@@ -36,7 +36,7 @@ mkdir -p lib
 mkdir -p public/javascripts
 </code></pre>
 
-2. Copy lib/facebook.js into /lib and lib/jquery.facebook.js into public/javascripts
+2. Copy "lib/facebook.js":blob/master/lib/facebook.js into /lib and "lib/jquery.facebook.js":blob/master/lib/jquery.facebook.js into public/javascripts
 
 3. Place a file called xd_receiver.htm into your public directory, this is for "Facebook cross-domain communication":http://wiki.developers.facebook.com/index.php/Cross_Domain_Communication_Channel:
 
