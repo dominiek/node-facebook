@@ -28,7 +28,7 @@
    */
   $.fbInit = function (api_key, options) {
     apiKey = api_key;
-    fbOptions = options || {};
+    fbOptions = options || {reloadIfSessionStateChanged: true, doNotUseCachedConnectState: true};
     FB_RequireFeatures(["Api"], function() {
       FB.Facebook.init(api_key, fbOptions['xd_receiver'] || '/xd_receiver.htm');
     });
@@ -51,22 +51,24 @@
     if(!options['include']) {
       options['include'] = ['name', 'pic'];
     }
-    FB.Connect.requireSession(function () {
-      $.fbProfile(options['include'], function (profile) {
-        $.post(fbOptions['sessionSyncAction'] || "/fbSession", profile, function (fbSession) {
-          if (fbSession['userId']) {
-            authenticated = true;
-            authenticatedFbSession = fbSession;
-            if(callback) {
-              callback(fbSession);
+    FB_RequireFeatures(["Connect", "Api"], function() {
+      FB.Connect.requireSession(function () {
+        $.fbProfile(options['include'], function (profile) {
+          $.post(fbOptions['sessionSyncAction'] || "/fbSession", profile, function (fbSession) {
+            if (fbSession['userId']) {
+              authenticated = true;
+              authenticatedFbSession = fbSession;
+              if(callback) {
+                callback(fbSession);
+              }
+            } else {
+              authenticated = false;
+              if(callback) {
+                callback();
+              }
             }
-          } else {
-            authenticated = false;
-            if(callback) {
-              callback();
-            }
-          }
-        }, 'json');
+          }, 'json');
+        });
       });
     });
   };
@@ -163,6 +165,32 @@
         }
     }
     return cookieValue;
+  };
+  
+  /**
+   * Authenticate a Facebook iFrame Application
+   *
+   * @example $.fbIframeAuthenticate({}, function () { alert('OK'); })
+   * @desc Include only the User's Facebook name when authenticating
+   *
+   * @param Hash options Valid: 'permissions'
+   * @param Function callback
+   * @return null
+   * @type null
+   *
+   */
+  $.fbIframeAuthenticate = function (options, callback) {
+    if(!options) { options = {}; }
+    var req_perms = '';
+    if(options['permissions']) {
+      req_perms = "&req_perms=" + options['permissions'].join(',');
+    }
+    var next = '';
+    if(options['canvas_name']) {
+      next = "&next=http://apps.facebook.com/"+options['canvas_name'];
+    }
+    var url = "http://www.facebook.com/login.php?api_key="+apiKey+''+next+"&display=popup&fbconnect=true"+req_perms;
+    window.open(url);
   };
   
 })(jQuery);

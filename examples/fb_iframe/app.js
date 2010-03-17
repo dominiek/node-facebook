@@ -25,6 +25,7 @@ configure(function(){
 // This is the canvas URL set in the Facebook Application settings
 get('/iframe', function (){
   var fbSession = this.fbSession() // Will create a session based on verified data from the GET params
+  
   this.sendfile(__dirname + '/public/iframe.html')
 })
 

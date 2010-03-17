@@ -1,9 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
-<html xmlns="http://www.w3.org/1999/xhtml"> 
+<html> 
  <head> 
+    <title>Nodogoshi</title>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
     <script type="text/javascript" src="/javascripts/jquery.facebook.js"></script>
+    
     <script type="text/javascript">
       $(document).ready(function () {
         $.fbInit('e1249f7d4bc25b8f90e5c9c7523e3ee1');
@@ -17,20 +17,25 @@
         }, function () {
           // Not authenticated
           $('.not_authenticated').show();
+          $('#authenticate').click(function () {
+            $.fbIframeAuthenticate({'canvas_name': 'nodogoshi'});
+            return false;
+          });
         });
-        
       });
     </script>
   </head>
   
   <body>
     <div id="fb-root"></div>
+    <script type="text/javascript" src="http://static.ak.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
+    
     <div id="my-account">
       <div class="authenticated" style="display: none">
         Hi there <span id="fb-first_name"></span>!
       </div>
       <div class="not_authenticated" style="display: none">
-        Viewing anonymously.
+        Viewing anonymously, <a href="#" id="authenticate">click here</a> to authenticate.
       </div>
     </div>
   </body> 
