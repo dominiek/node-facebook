@@ -170,16 +170,15 @@
   /**
    * Authenticate a Facebook iFrame Application
    *
-   * @example $.fbIframeAuthenticate({}, function () { alert('OK'); })
-   * @desc Include only the User's Facebook name when authenticating
+   * @example $.fbIframeAuthenticate({'canvas_name': 'mypath', 'permissions': ['offline_access', 'stream_publish']})
+   * @desc Do a popup authentication for iFrames, Facebook's authentication flow is in a constant state of fuckedness
    *
-   * @param Hash options Valid: 'permissions'
-   * @param Function callback
+   * @param Hash options Valid: 'canvas_name', the path of your fb app apps.facebook.com/<canvas_name>, 'permissions'
    * @return null
    * @type null
    *
    */
-  $.fbIframeAuthenticate = function (options, callback) {
+  $.fbIframeAuthenticate = function (options) {
     if(!options) { options = {}; }
     var req_perms = '';
     if(options['permissions']) {

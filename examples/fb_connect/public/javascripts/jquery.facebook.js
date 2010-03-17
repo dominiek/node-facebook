@@ -28,7 +28,7 @@
    */
   $.fbInit = function (api_key, options) {
     apiKey = api_key;
-    fbOptions = options || {};
+    fbOptions = options || {reloadIfSessionStateChanged: true, doNotUseCachedConnectState: true};
     FB_RequireFeatures(["Api"], function() {
       FB.Facebook.init(api_key, fbOptions['xd_receiver'] || '/xd_receiver.htm');
     });
@@ -51,22 +51,24 @@
     if(!options['include']) {
       options['include'] = ['name', 'pic'];
     }
-    FB.Connect.requireSession(function () {
-      $.fbProfile(options['include'], function (profile) {
-        $.post(fbOptions['sessionSyncAction'] || "/fbSession", profile, function (fbSession) {
-          if (fbSession['userId']) {
-            authenticated = true;
-            authenticatedFbSession = fbSession;
-            if(callback) {
-              callback(fbSession);
+    FB_RequireFeatures(["Connect", "Api"], function() {
+      FB.Connect.requireSession(function () {
+        $.fbProfile(options['include'], function (profile) {
+          $.post(fbOptions['sessionSyncAction'] || "/fbSession", profile, function (fbSession) {
+            if (fbSession['userId']) {
+              authenticated = true;
+              authenticatedFbSession = fbSession;
+              if(callback) {
+                callback(fbSession);
+              }
+            } else {
+              authenticated = false;
+              if(callback) {
+                callback();
+              }
             }
-          } else {
-            authenticated = false;
-            if(callback) {
-              callback();
-            }
-          }
-        }, 'json');
+          }, 'json');
+        });
       });
     });
   };
@@ -163,6 +165,31 @@
         }
     }
     return cookieValue;
+  };
+  
+  /**
+   * Authenticate a Facebook iFrame Application
+   *
+   * @example $.fbIframeAuthenticate({'canvas_name': 'mypath', 'permissions': ['offline_access', 'stream_publish']})
+   * @desc Do a popup authentication for iFrames, Facebook's authentication flow is in a constant state of fuckedness
+   *
+   * @param Hash options Valid: 'canvas_name', the path of your fb app apps.facebook.com/<canvas_name>, 'permissions'
+   * @return null
+   * @type null
+   *
+   */
+  $.fbIframeAuthenticate = function (options) {
+    if(!options) { options = {}; }
+    var req_perms = '';
+    if(options['permissions']) {
+      req_perms = "&req_perms=" + options['permissions'].join(',');
+    }
+    var next = '';
+    if(options['canvas_name']) {
+      next = "&next=http://apps.facebook.com/"+options['canvas_name'];
+    }
+    var url = "http://www.facebook.com/login.php?api_key="+apiKey+''+next+"&display=popup&fbconnect=true"+req_perms;
+    window.open(url);
   };
   
 })(jQuery);
