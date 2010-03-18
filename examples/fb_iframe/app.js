@@ -14,7 +14,7 @@ configure(function(){
   use(ContentLength)
   use(Cookie)
   use(Session)
-  use(CommonLogger)
+  use(Logger)
   use(require('facebook').Facebook, {
     apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
     apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'

@@ -1,5 +1,7 @@
 h1. Facebook Connect for NodeJS
 
+_Note: I wrote an "article on howtonode.org":http://howtonode.org/facebook-connect on how to use Facebook Connect with Node_
+
 This library contains NodeJS and jQuery scripts together with examples that allow you to easily integrate with Facebook. By making use of "Facebook's Javascript Client Library":http://wiki.developers.facebook.com/index.php/JavaScript_Client_Library we only have to do the minimal amount effort on the server-side, which "could be a good thing":http://synaptify.com/?p=613702.
 
 There are two main ways of integrating with Facebook and both require you to "sign up for a Facebook Application":http://facebook.com/developer. If you want your web application to run inside Facebook, you need to make sure to verify users inside the Facebook Canvas (See example 2), otherwise, if you want users to use Facebook Connect to log onto your site, check Example 1.
@@ -70,7 +72,7 @@ configure(function(){
   use(ContentLength)
   use(Cookie)
   use(Session)
-  use(CommonLogger)
+  use(Logger)
   use(require('facebook').Facebook, {
     apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
     apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
@@ -128,12 +130,11 @@ h3. /public/index.html
 <html xmlns="http://www.w3.org/1999/xhtml"> 
  <head> 
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
     <script type="text/javascript" src="/javascripts/jquery.facebook.js"></script>
     <script type="text/javascript">
       $(document).ready(function () {
         $.fbInit('e1249f7d4bc25b8f90e5c9c7523e3ee1');
-
+        
         // FB Connect action
         $('#fb-connect').bind('click', function () {
           $.fbConnect({'include': ['first_name', 'last_name', 'name', 'pic']}, function (fbSession) {
@@ -143,7 +144,7 @@ h3. /public/index.html
           });
           return false;
         });
-
+        
         // FB Logout action
         $('#fb-logout').bind('click', function () {
           $.fbLogout(function () {
@@ -152,7 +153,7 @@ h3. /public/index.html
           });
           return false;
         });
-
+        
         // Check whether we're logged in and arrange page accordingly
         $.fbIsAuthenticated(function (fbSession) {
           // Authenticated!
@@ -162,13 +163,15 @@ h3. /public/index.html
           // Not authenticated
           $('.not_authenticated').show();
         });
-
+        
       });
     </script>
   </head>
-
+  
   <body>
     <div id="fb-root"></div>
+    <script type="text/javascript" src="http://static.ak.connect.facebook.com/js/api_lib/v0.4/FeatureLoader.js.php"></script>
+    
     <div id="my-account">
       <div class="authenticated" style="display: none">
         Hi there <span id="fb-first_name"></span>!
@@ -200,7 +203,7 @@ configure(function(){
   use(ContentLength)
   use(Cookie)
   use(Session)
-  use(CommonLogger)
+  use(Logger)
   use(require('facebook').Facebook, {
     apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
     apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
