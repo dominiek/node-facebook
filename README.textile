@@ -90,8 +90,7 @@ app.get('/fbSession', function(req, res){
   }
 
   // The client will only assume authentication was OK if userId exists
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
+  res.send(JSON.stringify(fbSession || {}), {'Content-Type: 'application/json'});
 })
 
 // Called after a successful FB Connect
@@ -105,22 +104,21 @@ app.post('/fbSession', function(req, res) {
     fbSession.first_name = req.params['first_name']
   }
 
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
+  res.send(JSON.stringify(fbSession || {}), {'Content-Type: 'application/json'});
 })
 
 // Called on Facebook logout
 app.post('/fbLogout', function(req, res) {
   req.fbLogout();
-  this.halt(200, JSON.stringify({}))
+  res.send(JSON.stringify({}))
 })
 
 // Static files in ./public
-app.get('/', function(file){ this.sendfile(__dirname + '/public/index.html') })
-app.get('/xd_receiver.htm', function(file){ this.sendfile(__dirname + '/public/xd_receiver.htm') })
-app.get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
+app.get('/', function(req, res){ res.sendfile(__dirname + '/public/index.html') })
+app.get('/xd_receiver.htm', function(req, res){ res.sendfile(__dirname + '/public/xd_receiver.htm') })
+app.get('/javascripts/jquery.facebook.js', function(res, res){ res.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
 
-run()
+app.listen()
 
 </code></pre>
 
@@ -213,7 +211,7 @@ app.configure(function(){
 // This is the canvas URL set in the Facebook Application settings
 app.get('/iframe', function(req, res) {
   var fbSession = req.fbSession() // Will create a session based on verified data from the GET params
-  this.sendfile(__dirname + '/public/iframe.html')
+  res.sendfile(__dirname + '/public/iframe.html')
 })
 
 // Called to get information about the current authenticated user
@@ -226,15 +224,14 @@ app.get('/fbSession', function(req, res){
   }
 
   // The client will only assume authentication was OK if userId exists
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
+  res.send(JSON.stringify(fbSession || {}), {'Content-Type: 'application/json'});
 })
 
 // Static files in ./public
-app.get('/xd_receiver.htm', function(file){ this.sendfile(__dirname + '/public/xd_receiver.htm') })
-app.get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
+app.get('/xd_receiver.htm', function(req, res){ res.sendfile(__dirname + '/public/xd_receiver.htm') })
+app.get('/javascripts/jquery.facebook.js', function(req, res){ res.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
 
-app.listen(3000)
+app.listen()
 
 </code></pre>
 
