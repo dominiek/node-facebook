@@ -22,13 +22,6 @@ git submodule init
 git submodule update
 </code></pre>
 
-Also, we need to install "hashlib":http://github.com/brainfucker/hashlib, a NodeJS library provided by mr Brainfucker:
-
-<pre><code>git submodule add git://github.com/brainfucker/hashlib.git lib/support/hashlib
-cd lib/support/hashlib
-make
-</code></pre>
-
 h2. Setting up your Project
 
 1. Create the necessary folders:
@@ -62,9 +55,8 @@ h3. /app.js
 
 <pre><code>require.paths.unshift(__dirname + '/lib')
 require.paths.unshift(__dirname + '/lib/support/express/lib')
-require.paths.unshift(__dirname + '/lib/support/hashlib/build/default')
 
-var exress = require('express')
+var express = require('express')
 var app = express.createServer();
 
 app.configure(function(){
@@ -191,7 +183,6 @@ h3. /app.js
 
 <pre><code>require.paths.unshift(__dirname + '/lib')
 require.paths.unshift(__dirname + '/lib/support/express/lib')
-require.paths.unshift(__dirname + '/lib/support/hashlib/build/default')
 
 var express = require('express')
 var app = express,createServer();
