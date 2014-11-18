@@ -1,21 +1,16 @@
 
-require.paths.unshift('spec', '/opt/local/lib/ruby/gems/1.8/gems/jspec-3.3.2/lib', 'lib')
-require.paths.unshift('spec', 'lib', 'spec/lib')
+require.paths.unshift('/home/francois/.gem/ruby/1.8/gems/jspec-4.3.3/lib')
 require.paths.unshift(__dirname + '/../lib')
-require.paths.unshift(__dirname + '/../lib/support')
-require.paths.unshift(__dirname + '/../lib/support/express/lib')
-require.paths.unshift(__dirname + '/../lib/support/hashlib/build/default')
 
-require('jspec')
-require("express")
-require("express/spec")
+var JSPEC = require('jspec');
+var express = require("express")
 
-print = puts
+print = require('sys').puts
 quit = process.exit
 
-Express.environment = 'test'
+//Express.environment = 'test'
 
 JSpec
-  .exec('./spec.plugins.facebook.js')
+  .exec(__dirname +'/spec.plugins.facebook.js')
   .run({ reporter: JSpec.reporters.Terminal, fixturePath: 'spec/fixtures' })
   .report()

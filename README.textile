@@ -22,13 +22,6 @@ git submodule init
 git submodule update
 </code></pre>
 
-Also, we need to install "hashlib":http://github.com/brainfucker/hashlib, a NodeJS library provided by mr Brainfucker:
-
-<pre><code>git submodule add git://github.com/brainfucker/hashlib.git lib/support/hashlib
-cd lib/support/hashlib
-make
-</code></pre>
-
 h2. Setting up your Project
 
 1. Create the necessary folders:
@@ -62,27 +55,26 @@ h3. /app.js
 
 <pre><code>require.paths.unshift(__dirname + '/lib')
 require.paths.unshift(__dirname + '/lib/support/express/lib')
-require.paths.unshift(__dirname + '/lib/support/hashlib/build/default')
 
-require('express')
-require('express/plugins')
+var express = require('express')
+var app = express.createServer();
 
-configure(function(){
-  use(MethodOverride)
-  use(ContentLength)
-  use(Cookie)
-  use(Session)
-  use(Logger)
-  use(require('facebook').Facebook, {
+app.configure(function(){
+  app.use(express.methodOverride())
+  app.use(ContentLength)
+  app.use(Cookie)
+  app.use(Session)
+  app.use(Logger)
+  app.use(require('facebook').Facebook(dx{
     apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
     apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
   })
-  set('root', __dirname)
+  app.set('root', __dirname)
 })
 
 // Called to get information about the current authenticated user
-get('/fbSession', function(){
-  var fbSession = this.fbSession()
+app.get('/fbSession', function(req, res){
+  var fbSession = req.fbSession()
 
   if(fbSession) {
     // Here would be a nice place to lookup userId in the database
@@ -90,37 +82,35 @@ get('/fbSession', function(){
   }
 
   // The client will only assume authentication was OK if userId exists
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
+  res.send(JSON.stringify(fbSession || {}), {'Content-Type: 'application/json'});
 })
 
 // Called after a successful FB Connect
-post('/fbSession', function() {
-  var fbSession = this.fbSession() // Will return null if verification was unsuccesful
+app.post('/fbSession', function(req, res) {
+  var fbSession = req.fbSession() // Will return null if verification was unsuccesful
 
   if(fbSession) {
     // Now that we have a Facebook Session, we might want to store this new user in the db
     // Also, in this.params there is additional information about the user (name, pic, first_name, etc)
     // Note of warning: unlike fbSession, this additional information has not been verified
-    fbSession.first_name = this.params.post['first_name']
+    fbSession.first_name = req.params['first_name']
   }
 
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
+  res.send(JSON.stringify(fbSession || {}), {'Content-Type: 'application/json'});
 })
 
 // Called on Facebook logout
-post('/fbLogout', function() {
-  this.fbLogout();
-  this.halt(200, JSON.stringify({}))
+app.post('/fbLogout', function(req, res) {
+  req.fbLogout();
+  res.send(JSON.stringify({}))
 })
 
 // Static files in ./public
-get('/', function(file){ this.sendfile(__dirname + '/public/index.html') })
-get('/xd_receiver.htm', function(file){ this.sendfile(__dirname + '/public/xd_receiver.htm') })
-get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
+app.get('/', function(req, res){ res.sendfile(__dirname + '/public/index.html') })
+app.get('/xd_receiver.htm', function(req, res){ res.sendfile(__dirname + '/public/xd_receiver.htm') })
+app.get('/javascripts/jquery.facebook.js', function(res, res){ res.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
 
-run()
+app.listen()
 
 </code></pre>
 
@@ -193,33 +183,31 @@ h3. /app.js
 
 <pre><code>require.paths.unshift(__dirname + '/lib')
 require.paths.unshift(__dirname + '/lib/support/express/lib')
-require.paths.unshift(__dirname + '/lib/support/hashlib/build/default')
 
-require('express')
-require('express/plugins')
+var express = require('express')
+var app = express,createServer();
 
-configure(function(){
-  use(MethodOverride)
-  use(ContentLength)
-  use(Cookie)
-  use(Session)
-  use(Logger)
-  use(require('facebook').Facebook, {
+app.configure(function(){
+  app.use(express.methodOverride())
+  app.use(express.cookieDecoder())
+  app.use(express.session())
+  app.use(express.logger())
+  app.use(require('facebook').Facebook({
     apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
     apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
   })
-  set('root', __dirname)
+  express.staticProvider(__dirname + '/public')
 })
 
 // This is the canvas URL set in the Facebook Application settings
-get('/iframe', function (){
-  var fbSession = this.fbSession() // Will create a session based on verified data from the GET params
-  this.sendfile(__dirname + '/public/iframe.html')
+app.get('/iframe', function(req, res) {
+  var fbSession = req.fbSession() // Will create a session based on verified data from the GET params
+  res.sendfile(__dirname + '/public/iframe.html')
 })
 
 // Called to get information about the current authenticated user
-get('/fbSession', function(){
-  var fbSession = this.fbSession()
+app.get('/fbSession', function(req, res){
+  var fbSession = req.fbSession()
 
   if(fbSession) {
     // Here would be a nice place to lookup userId in the database
@@ -227,15 +215,14 @@ get('/fbSession', function(){
   }
 
   // The client will only assume authentication was OK if userId exists
-  this.contentType('json')
-  this.halt(200, JSON.stringify(fbSession || {}))
+  res.send(JSON.stringify(fbSession || {}), {'Content-Type: 'application/json'});
 })
 
 // Static files in ./public
-get('/xd_receiver.htm', function(file){ this.sendfile(__dirname + '/public/xd_receiver.htm') })
-get('/javascripts/jquery.facebook.js', function(file){ this.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
+app.get('/xd_receiver.htm', function(req, res){ res.sendfile(__dirname + '/public/xd_receiver.htm') })
+app.get('/javascripts/jquery.facebook.js', function(req, res){ res.sendfile(__dirname + '/public/javascripts/jquery.facebook.js') })
 
-run()
+app.listen()
 
 </code></pre>
 

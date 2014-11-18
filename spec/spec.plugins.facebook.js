@@ -1,20 +1,22 @@
 
 describe 'Express'
   before_each
-    reset()
     facebook = require('facebook')
-    use(facebook.Facebook, {
+    var express = require('express')
+    var querystring = require('querystring')
+    app = express.createServer();
+    app.use(facebook.Facebook, {
       apiKey: 'e1249f7d4bc25b8f90e5c9c7523e3ee1', 
       apiSecret: '4ae45734dd66fa85c7b189fc2d7d5b4c'
     })
     
-    validCookies = {
-     "e1249f7d4bc25b8f90e5c9c7523e3ee1": "5b820bb72e780318acb26ff375db4cc9",
-     "e1249f7d4bc25b8f90e5c9c7523e3ee1_user": "687215451",
-     "e1249f7d4bc25b8f90e5c9c7523e3ee1_ss": "lWYbyFp0GP8e7BgPa1aLDg__",
-     "e1249f7d4bc25b8f90e5c9c7523e3ee1_session_key": "3.LIysipyTte6aXFBcStEixg__.3600.1267714800-687215451",
-     "e1249f7d4bc25b8f90e5c9c7523e3ee1_expires": "1267714800"
-    }
+    validCookies = {"e1249f7d4bc25b8f90e5c9c7523e3ee1": querystring.stringify({
+        "sig" : "e",
+        "user":"687215451",
+        "ss":"lWYbyFp0GP8e7BgPa1aLDg__",
+        "session_key":"3.LIysipyTte6aXFBcStEixg__.3600.1267714800-687215451",
+        "expires":"1267714800"
+    })}
     
     tamperedCookies = {
       "e1249f7d4bc25b8f90e5c9c7523e3ee1": "5b820bb72e780318acb26ff375db4cc9",
@@ -78,7 +80,7 @@ describe 'Express'
     
       it 'should return a well formatted fingerprint'
         var fingerprint = facebook.getFingerprintForCookie('e1249f7d4bc25b8f90e5c9c7523e3ee1', validCookies)
-        fingerprint.should.eql("expires=1267714800session_key=3.LIysipyTte6aXFBcStEixg__.3600.1267714800-687215451ss=lWYbyFp0GP8e7BgPa1aLDg__user=687215451")
+fingerprint.should.eql({fingerprint: "expires=1267714800session_key=3.LIysipyTte6aXFBcStEixg__.3600.1267714800-687215451ss=lWYbyFp0GP8e7BgPa1aLDg__user=687215451", sig: "e"})
       end
       
     end
